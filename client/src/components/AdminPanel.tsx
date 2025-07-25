@@ -86,17 +86,17 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
   };
 
   // Fetch data
-  const { data: tours = [] } = useQuery({
+  const { data: tours = [] } = useQuery<Tour[]>({
     queryKey: ["/api/tours"],
     enabled: isAuthenticated,
   });
 
-  const { data: guides = [] } = useQuery({
+  const { data: guides = [] } = useQuery<Guide[]>({
     queryKey: ["/api/guides"],
     enabled: isAuthenticated,
   });
 
-  const { data: customRequests = [] } = useQuery({
+  const { data: customRequests = [] } = useQuery<CustomTourRequest[]>({
     queryKey: ["/api/custom-tours"],
     enabled: isAuthenticated,
   });
@@ -217,7 +217,7 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
               </div>
               
               <div className="grid gap-4">
-                {(tours as Tour[]).map((tour: Tour) => (
+                {tours.map((tour: Tour) => (
                   <Card key={tour.id}>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start">
@@ -259,12 +259,12 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
                 <h3 className="text-lg font-semibold">Registered Guides</h3>
                 <div className="flex gap-2">
                   <Badge variant="secondary">Total: {guides.length}</Badge>
-                  <Badge variant="outline">Pending: {(guides as Guide[]).filter((g: Guide) => g.status === 'pending').length}</Badge>
+                  <Badge variant="outline">Pending: {guides.filter((g) => g.status === 'pending').length}</Badge>
                 </div>
               </div>
 
               <div className="grid gap-4">
-                {(guides as Guide[]).map((guide: Guide) => (
+                {guides.map((guide) => (
                   <Card key={guide.id}>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start">
@@ -327,12 +327,12 @@ export default function AdminPanel({ isOpen, onClose }: AdminPanelProps) {
                 <h3 className="text-lg font-semibold">Custom Tour Requests</h3>
                 <div className="flex gap-2">
                   <Badge variant="secondary">Total: {customRequests.length}</Badge>
-                  <Badge variant="outline">Pending: {(customRequests as CustomTourRequest[]).filter((r: CustomTourRequest) => r.status === 'pending').length}</Badge>
+                  <Badge variant="outline">Pending: {customRequests.filter((r) => r.status === 'pending').length}</Badge>
                 </div>
               </div>
 
               <div className="grid gap-4">
-                {(customRequests as CustomTourRequest[]).map((request: CustomTourRequest) => (
+                {customRequests.map((request) => (
                   <Card key={request.id}>
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start">

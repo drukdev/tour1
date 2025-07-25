@@ -57,8 +57,8 @@ export default function CustomTourRequestForm() {
   });
 
   const requestMutation = useMutation({
-    mutationFn: (data: CustomTourFormData) => 
-      apiRequest("/api/custom-tours", { method: "POST", body: data }),
+    mutationFn: (data: CustomTourFormData) =>
+      apiRequest("POST", "/api/custom-tours", data),
     onSuccess: () => {
       setIsSubmitted(true);
       toast({
@@ -169,7 +169,7 @@ export default function CustomTourRequestForm() {
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 (555) 000-0000" {...field} />
+                      <Input placeholder="+1 (555) 000-0000" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -246,6 +246,7 @@ export default function CustomTourRequestForm() {
                           min="1000"
                           placeholder="5000"
                           {...field}
+                          value={field.value ?? 0}
                           onChange={(e) => field.onChange(parseInt(e.target.value))}
                         />
                       </FormControl>
@@ -262,7 +263,7 @@ export default function CustomTourRequestForm() {
                   <FormItem>
                     <FormLabel>Preferred Travel Dates</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., March 2024, Spring 2024, or specific dates" {...field} />
+                      <Input placeholder="e.g., March 2024, Spring 2024, or specific dates" {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -375,7 +376,7 @@ export default function CustomTourRequestForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Accommodation Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value ?? "standard"}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
@@ -401,7 +402,7 @@ export default function CustomTourRequestForm() {
                       <Car className="w-4 h-4" />
                       Transportation Preference
                     </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value ?? "private"}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
@@ -429,7 +430,8 @@ export default function CustomTourRequestForm() {
                     <Textarea 
                       placeholder="Any special dietary requirements, accessibility needs, or other preferences..."
                       className="min-h-[100px]"
-                      {...field} 
+                      {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
                   <FormMessage />

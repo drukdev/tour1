@@ -39,14 +39,16 @@ export default function GuideRegistrationForm() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: (data: Omit<GuideFormData, 'confirmEmail'>) => 
-      apiRequest("/api/guides/register", { method: "POST", body: data }),
-    onSuccess: (response) => {
+    mutationFn: async (data: Omit<GuideFormData, "confirmEmail">) => {
+      const response = await apiRequest("POST", "/api/guides/register", data);
+      return response.json();
+    },
+    onSuccess: (data) => {
       setIsSubmitted(true);
       toast({
         title: "Registration Successful!",
-        description: response.message,
-        duration: 5000
+        description: data.message,
+        duration: 5000,
       });
       form.reset();
     },
