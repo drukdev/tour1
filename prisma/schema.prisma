@@ -1,0 +1,160 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+}
+
+model Tour {
+  id             Int       @id @default(autoincrement())
+  name           String
+  description    String
+  duration       Int
+  price          Int
+  category       String
+  imageUrl       String    @map("image_url")
+  rating         Decimal   @default(5.0) @db.Decimal(2, 1)
+  reviewCount    Int       @default(0) @map("review_count")
+  highlights     String[]
+  isActive       Boolean   @default(true) @map("is_active")
+  maxGroupSize   Int       @default(12) @map("max_group_size")
+  difficulty     String    @default("Moderate")
+  bestSeason     String    @default("Spring") @map("best_season")
+  includes       String[]
+  excludes       String[]
+  bookings       Booking[]
+  itineraries    Itinerary[]
+}
+
+model Booking {
+  id              Int       @id @default(autoincrement())
+  tourId          Int       @map("tour_id")
+  firstName       String    @map("first_name")
+  lastName        String    @map("last_name")
+  email           String
+  phone           String?
+  travelDate      String    @map("travel_date")
+  groupSize       Int       @map("group_size")
+  specialRequests String?   @map("special_requests")
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  tour            Tour      @relation(fields: [tourId], references: [id])
+}
+
+model Inquiry {
+  id             Int      @id @default(autoincrement())
+  firstName      String   @map("first_name")
+  lastName       String   @map("last_name")
+  email          String
+  phone          String?
+  tourInterest   String?  @map("tour_interest")
+  preferredDates String?  @map("preferred_dates")
+  groupSize      String?  @map("group_size")
+  message        String?
+  status         String   @default("new")
+  createdAt      DateTime @default(now()) @map("created_at")
+}
+
+model Testimonial {
+  id        Int     @id @default(autoincrement())
+  name      String
+  country   String
+  imageUrl  String  @map("image_url")
+  text      String
+  rating    Int
+  tripName  String  @map("trip_name")
+  duration  String
+  isActive  Boolean @default(true) @map("is_active")
+}
+
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  title       String
+  excerpt     String
+  content     String
+  imageUrl    String   @map("image_url")
+  category    String
+  author      String
+  authorImage String   @map("author_image")
+  readTime    String   @map("read_time")
+  publishedAt DateTime @default(now()) @map("published_at")
+  isPublished Boolean  @default(true) @map("is_published")
+}
+
+model Guide {
+  id                Int         @id @default(autoincrement())
+  name              String
+  email             String      @unique
+  phone             String
+  licenseImageUrl   String      @map("license_image_url")
+  registrationType  String      @map("registration_type")
+  status            String      @default("not_assigned")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  assignedItineraries Itinerary[] @relation("GuideToItinerary")
+  drivenItineraries   Itinerary[] @relation("DriverToItinerary")
+}
+
+model Itinerary {
+  id                   Int                 @id @default(autoincrement())
+  tourId               Int                 @map("tour_id")
+  name                 String
+  description          String?
+  startDate            DateTime            @db.Date @map("start_date")
+  endDate              DateTime            @db.Date @map("end_date")
+  guideId              Int?                @map("guide_id")
+  driverId             Int?                @map("driver_id")
+  maxParticipants      Int                 @default(12) @map("max_participants")
+  currentParticipants  Int                 @default(0) @map("current_participants")
+  status               String              @default("active")
+  createdAt            DateTime            @default(now()) @map("created_at")
+  tour                 Tour                @relation(fields: [tourId], references: [id])
+  guide                Guide?              @relation("GuideToItinerary", fields: [guideId], references: [id])
+  driver               Guide?              @relation("DriverToItinerary", fields: [driverId], references: [id])
+  days                 ItineraryDay[]
+  CustomTourRequest    CustomTourRequest[]
+}
+
+model ItineraryDay {
+  id            Int       @id @default(autoincrement())
+  itineraryId   Int       @map("itinerary_id")
+  dayNumber     Int       @map("day_number")
+  title         String
+  description   String
+  activities    String[]
+  accommodation String?
+  meals         String[]
+  transportation String?
+  notes         String?
+  itinerary     Itinerary @relation(fields: [itineraryId], references: [id])
+}
+
+model CustomTourRequest {
+  id                  Int       @id @default(autoincrement())
+  firstName           String    @map("first_name")
+  lastName            String    @map("last_name")
+  email               String
+  phone               String?
+  duration            Int
+  groupSize           Int       @map("group_size")
+  budget              Int?
+  interests           String[]
+  preferredDates      String?   @map("preferred_dates")
+  specialRequirements String?   @map("special_requirements")
+  destinations        String[]
+  accommodationType   String?   @map("accommodation_type")
+  transportPreference String?   @map("transport_preference")
+  status              String    @default("pending")
+  adminNotes          String?   @map("admin_notes")
+  estimatedPrice      Int?      @map("estimated_price")
+  assignedItineraryId Int?      @map("assigned_itinerary_id")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  assignedItinerary   Itinerary? @relation(fields: [assignedItineraryId], references: [id])
+}
