@@ -167,8 +167,8 @@ export default function TourFilter({ tours, onFilteredTours }: TourFilterProps) 
                 <SelectContent>
                   <SelectItem value="">All Categories</SelectItem>
                   {TOUR_CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

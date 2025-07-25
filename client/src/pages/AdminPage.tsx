@@ -7,28 +7,29 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Users, MapPin, MessageSquare, UserCheck } from "lucide-react";
+import type { Guide, Tour, CustomTourRequest } from "@shared/schema";
 
 export default function AdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Data queries
-  const { data: guides, isLoading: guidesLoading } = useQuery({
+  const { data: guides, isLoading: guidesLoading } = useQuery<Guide[]>({
     queryKey: ["/api/guides"],
   });
 
-  const { data: itineraries, isLoading: itinerariesLoading } = useQuery({
-    queryKey: ["/api/itineraries"],
+  const { data: itineraries, isLoading: itinerariesLoading } = useQuery<Tour[]>({
+    queryKey: ["/api/tours"],
   });
 
-  const { data: customTourRequests, isLoading: requestsLoading } = useQuery({
+  const { data: customTourRequests, isLoading: requestsLoading } = useQuery<CustomTourRequest[]>({
     queryKey: ["/api/custom-tours"],
   });
 
   // Guide status update
   const updateGuideStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: number; status: string }) =>
-      apiRequest(`/api/guides/${id}/status`, { method: "PATCH", body: { status } }),
+      apiRequest("PATCH", `/api/guides/${id}/status`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/guides"] });
       toast({
@@ -41,7 +42,7 @@ export default function AdminPage() {
   // Custom tour request status update
   const updateTourRequestMutation = useMutation({
     mutationFn: ({ id, updates }: { id: number; updates: any }) =>
-      apiRequest(`/api/custom-tours/${id}`, { method: "PUT", body: updates }),
+      apiRequest("PUT", `/api/custom-tours/${id}`, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/custom-tours"] });
       toast({
@@ -108,7 +109,7 @@ export default function AdminPage() {
                   <div className="text-center py-8">Loading guides...</div>
                 ) : guides && guides.length > 0 ? (
                   <div className="space-y-4">
-                    {guides.map((guide: any) => (
+                    {guides.map((guide) => (
                       <div key={guide.id} className="border border-gray-200 rounded-lg p-4">
                         <div className="flex justify-between items-start">
                           <div>
@@ -191,19 +192,16 @@ export default function AdminPage() {
                   <div className="text-center py-8">Loading itineraries...</div>
                 ) : itineraries && itineraries.length > 0 ? (
                   <div className="space-y-4">
-                    {itineraries.map((itinerary: any) => (
+                    {itineraries.map((itinerary) => (
                       <div key={itinerary.id} className="border border-gray-200 rounded-lg p-4">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-semibold text-lg">{itinerary.title}</h3>
+                            <h3 className="font-semibold text-lg">{itinerary.name}</h3>
                             <p className="text-gray-600 mt-1">{itinerary.description}</p>
                             <div className="text-sm text-gray-600 space-y-1 mt-2">
                               <p>Duration: {itinerary.duration} days</p>
                               <p>Price: ${itinerary.price}</p>
                               <p>Group Size: {itinerary.maxGroupSize}</p>
-                              <p>Created: {new Date(itinerary.createdAt).toLocaleDateString()}</p>
-                              {itinerary.guideId && <p>Guide ID: {itinerary.guideId}</p>}
-                              {itinerary.driverId && <p>Driver ID: {itinerary.driverId}</p>}
                             </div>
                           </div>
                           <div className="space-x-2">
@@ -241,7 +239,7 @@ export default function AdminPage() {
                   <div className="text-center py-8">Loading requests...</div>
                 ) : customTourRequests && customTourRequests.length > 0 ? (
                   <div className="space-y-4">
-                    {customTourRequests.map((request: any) => (
+                    {customTourRequests.map((request) => (
                       <div key={request.id} className="border border-gray-200 rounded-lg p-4">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
